@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f6f8;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        text-align: center;
+        margin: 30px 0;
+        color: #4a4a4a;
+        font-size: 2.5em;
+        font-weight: 400;
+    }
+
+    .scroll-container {
+        max-height: 736px;
+        overflow-y: auto;
+        margin: 20px auto;
+        width: 90%;
+        border-radius: 10px;
+        background-color: #ffffff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95em;
+        min-width: 600px;
+        table-layout: auto;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+        background-color: #6c63ff;
+        color: #ffffff;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f8ff;
+    }
+
+    tr:hover {
+        background-color: #f1f5ff;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: center;
+    }
+
+    .actions button {
+        margin: 0 5px;
+        padding: 8px 16px;
+        color: #ffffff;
+        font-size: 0.85em;
+        font-weight: 600;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .actions button.enable {
+        background-color: #28a745;
+    }
+
+    .actions button.disable {
+        background-color: #dc3545;
+    }
+
+    .actions button:hover {
+        transform: scale(1.05);
+    }
+
+    .link {
+        color: #6c63ff;
+        text-decoration: underline;
+        font-weight: 600;
+    }
+
+    .link:hover {
+        text-decoration: none;
+        color: #4a4a4a;
+    }
+    
+</style>
+{% endblock css %}
+
+{% block body %}
+    <h1>User Management</h1>
+    <div class="scroll-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Sr. No</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Mobile No</th>
+                    <th>Aadhaar No</th>
+                    <th>User Type</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                {% for user in users %}
+            <tr class="{% if user.status == 'APPROVED' %}approved{% elif user.status == 'PENDING' %}pending{% elif user.status == 'REJECTED' %}rejected{% endif %}">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.mobile_no }}</td>
+                <td>{{ user.aadhar_no }}</td>
+                <td>{{ user.user_types }}</td>
+                <td style="
+                {% if user.status == 'APPROVED' %}
+                    color: #4CAF50;  /* Green */
+                {% elif user.status == 'PENDING' %}
+                    color: #FFEB3B;  /* Yellow */
+                {% elif user.status == 'REJECTED' %}
+                    color: #F44336;  /* Red */
+                {% endif %}
+            ">
+                {{ user.status }}
+                <td class="actions">
+                    <a href="{% url 'edituser' user.id %}" class="edit">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                </td>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock body %}

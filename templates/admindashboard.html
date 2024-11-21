@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style>
+    /* Reset basic styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Container for the statistics */
+    .quick_activity_wrap {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Single activity box styling */
+    .single_quick_activity {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffffff;
+        border-radius: 15px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #e0e0e0;
+    }
+
+    .single_quick_activity:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Icon styling */
+    .icon img {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 10px;
+    }
+
+    /* Count content styling */
+    .count_content h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .count_content p {
+        font-size: 1rem;
+        color: #666;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+        .quick_activity_wrap {
+            grid-template-columns: 1fr;
+            padding: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="col-lg-12">
+    <div class="single_element">
+        <div class="quick_activity">
+            <div class="quick_activity_wrap">
+                <a href="{% url 'approve_users' %}?option=TOTAL">
+                    <div class="single_quick_activity">
+                        <div class="count_content">
+                            <h3><span class="counter"></span>{{totaldata}}</h3>
+                            <p>TOTAL REQUESTS</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="{% url 'approve_users' %}?option=APPROVED">
+                    <div class="single_quick_activity">
+                        <div class="count_content">
+                            <h3><span class="counter">{{allapproved}}</span></h3>
+                            <p>APPROVED REQUESTS</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="{% url 'approve_users' %}?option=REJECTED">
+                    <div class="single_quick_activity">
+                        <div class="count_content">
+                            <h3><span class="counter">{{allrejected}}</span></h3>
+                            <p>REJECTED REQUESTS</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="{% url 'approve_users' %}?option=PENDING">
+                    <div class="single_quick_activity">
+                        <div class="count_content">
+                            <h3><span class="counter">{{pendingdata}}</span></h3>
+                            <p>PENDING REQUESTS</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

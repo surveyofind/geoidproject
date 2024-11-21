@@ -1,0 +1,18 @@
+<!-- templates/input_form.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Geoid Height Calculator</title>
+</head>
+<body>
+    <h1>Geoid Height Calculator</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="coordinates">Coordinates (in DMS format):</label><br>
+        <input type="text" id="coordinates" name="coordinates" placeholder="30d19'27.95\"N 78d2'2.11\"E"><br><br>
+        <input type="submit" value="Calculate">
+    </form>
+</body>
+</html>

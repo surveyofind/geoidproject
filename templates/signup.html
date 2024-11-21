@@ -1,0 +1,198 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+        .password-input {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+    </style>
+    <title>Signup and NDA Download</title>
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="row">
+        <!-- Signup Form Section -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <!-- <h4 class="card-title">Sign Up</h4> -->
+                    <h4 style="background-color: #050551;color: white;" class="card-header"><b>Sign Up</b></h4>
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group mt-3">
+                            <label for="username"><b>Enter Username</b></label>
+                            <input type="text" name="username" id="username" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email"><b>Email:</b></label>
+                            <input type="email" name="email" id="email" class="form-control" required>
+                        </div>
+                        {% if errors %}
+                        <div style="color: red;"><b>{{ errors }}</b></div>
+                        {% endif %}
+                           
+                        <div class="form-group">
+                            <label for="password"><b>Password:</b></label>
+                            <div class="password-input">
+                                <input type="password" name="password" id="password" class="form-control" required>
+                                <span class="toggle-password" onclick="togglePasswordVisibility()">
+                                    <i class="far fa-eye"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="mobileno"><b>Mobile No:</b></label>
+                            <input type="number" name="mobileno" id="mobileno" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="aadhar"><b>Enter Aadhaar No:</b></label>
+                            <input type="text" name="aadhar" id="aadhar" class="form-control" required>
+                        </div>
+                        {% if errorss %}
+                        <div style="color: red;"><b>{{ errorss }}</b></div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="aadhar_card"><b>Upload Aadhaar Card:</b></label>
+                            <input type="file" name="aadhar_card" id="aadhar_card" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user_type"><b>User Type:</b></label>
+                            <select name="user_type" id="user_type" class="form-control" required onchange="toggleIDFields()">
+                                <option value=""><b>Select User Type</b></option>
+                                <option value="govt"><b>Government User</b></option>
+                                <option value="academic"><b>Academic User</b></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="nda_document"><b>Upload NDA Document:</b></label>
+                            <input type="file" name="nda_document" id="nda_document" class="form-control" required>
+                        </div>
+                    
+                        <!-- Government ID Field -->
+                        <div class="form-group conditional-field" id="governmentIdField" style="display: none;">
+                            <label for="goverment_id_no"><b>Enter Government Id No:</b></label>
+                            <input type="text" name="goverment_id_no" id="goverment_id_no" class="form-control">
+                        </div>
+                        {% if err %}
+                        <div style="color: red;"><b>{{ err }}</b></div>
+                        {% endif %}
+                        <div id="govtidcard-section" class="form-group conditional-field" style="display: none;">
+                            <label for="govtidcard"><b>Upload Government ID Card:</b></label>
+                            <input type="file" name="govtidcard" id="govtidcard" class="form-control">
+                        </div>
+                    
+                        <!-- Academic ID Field -->
+                        <div class="form-group conditional-field" id="studentIdField" style="display: none;">
+                            <label for="student_id_no"><b>Enter Student Id No:</b></label>
+                            <input type="text" name="student_id_no" id="student_id_no" class="form-control">
+                        </div>
+                        {% if erro %}
+                        <div style="color: red;"><b>{{ erro }}</b></div>
+                        {% endif %}
+                        <div id="academicidcard-section" class="form-group conditional-field" style="display: none;">
+                            <label for="academicidcard"><b>Upload Academic ID Card:</b></label>
+                            <input type="file" name="academicidcard" id="academicidcard" class="form-control">
+                        </div>
+                    
+                        <button type="submit" style="background-color: #050551;" class="btn btn-primary"><b>Signup</b></button>
+                        <div class="signup-link mt-3">
+                            <b>Already have an account?</b> <a href="{% url 'login_view' %}"><b>Login</b></a>
+                        </div>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- NDA Download Links Section -->
+        <div class="col-md-6">
+            <div class="nda-section card mb-4">
+                <h3 style="background-color: #050551;color: white;" class="card-header">Non-Disclosure Agreements</h3>
+                <div class="card-body">
+                    <!-- <div class="nda-item mb-4">
+                        <label><b>For Private Users:</b></label>
+                        <div class="download-link">
+                            <a   style="background-color: #050551;" href="{% static 'private_user.pdf' %}" download class="btn btn-primary">
+                                <i class="fas fa-download"></i> Download NDA
+                            </a>
+                        </div>
+                    </div> -->
+                    <div class="nda-item mb-4">
+                        <label><b>For Government Users:</b></label>
+                        <div class="download-link">
+                            <a style="background-color: #050551;" href="{% static 'govt_user.pdf' %}" download class="btn btn-primary">
+                                <i class="fas fa-download"></i> Download Certificate of Undertaking
+                            </a>
+                        </div>
+                    </div>
+                    <div class="nda-item mb-4">
+                        <label><b>For Academic Users:</b></label>
+                        <div class="download-link">
+                            <a style="background-color: #050551;" href="{% static 'academic_user.pdf' %}" download class="btn btn-primary">
+                                <i class="fas fa-download"></i> Download Certificate of Undertaking
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById("password");
+        const toggleIcon = document.querySelector(".toggle-password i");
+        
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.classList.replace("fa-eye-slash", "fa-eye");
+        }
+    }
+
+    function toggleIDFields() {
+        const userType = document.getElementById("user_type").value;
+        const govtIDField = document.getElementById("governmentIdField");
+        const govtIDSection = document.getElementById("govtidcard-section");
+        const studentIDField = document.getElementById("studentIdField");
+        const academicIDSection = document.getElementById("academicidcard-section");
+
+        if (userType === "govt") {
+            govtIDField.style.display = "block";
+            govtIDSection.style.display = "block";
+            studentIDField.style.display = "none";
+            academicIDSection.style.display = "none";
+        } else if (userType === "academic") {
+            studentIDField.style.display = "block";
+            academicIDSection.style.display = "block";
+            govtIDField.style.display = "none";
+            govtIDSection.style.display = "none";
+        } else {
+            govtIDField.style.display = "none";
+            govtIDSection.style.display = "none";
+            studentIDField.style.display = "none";
+            academicIDSection.style.display = "none";
+        }
+    }
+</script>
+</body>
+</html>

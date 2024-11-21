@@ -1,0 +1,17 @@
+<!-- templates/result.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Geoid Height Result</title>
+</head>
+<body>
+    <h1>Geoid Height Result</h1>
+    {% if geoid_height %}
+    <p>The geoid height at the specified coordinates is: {{ geoid_height }} meters.</p>
+    {% else %}
+    <p>No result found.</p>
+    {% endif %}
+</body>
+</html>

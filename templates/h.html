@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<style>
+    .text-container {
+        max-width: 100%;
+        padding: 20px;
+        border-radius: 12px;
+        background-color: #e9f7fe;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        color: #333;
+        text-align: left;
+    }
+    .text-container h4 {
+        font-size: 22px;
+        color: #001f3f;
+        margin-bottom: 15px;
+    }
+    .line {
+        margin: 10px 0;
+        font-size: 14px;
+        color: #555;
+        display: flex;
+        align-items: center;
+    }
+    .line i {
+        color: #001f3f;
+        margin-right: 10px;
+        font-size: 10px;
+    }
+    .download-link-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .download-link-container a {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .download-link-container a:hover {
+        background-color: #050551;
+    }
+    .form-heading {
+        text-align: center;
+        color: #001f3f;
+    }
+    .form-input-wrapper {
+        margin-bottom: 20px;
+    }
+    .form-input-wrapper label {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    .form-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+    .form-button:hover {
+        background-color: #003366;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="form-container">
+        <h2 class="form-heading">InGM: INDIAN GEOID MODEL</h2>
+        <h3 class="form-heading mb-3">Geoid Undulation (N-Value)</h3>
+        
+        <!-- Hide the image based on selection -->
+        <img src="{% static 'img/h.jpeg' %}" alt="Side Image" class="img-fluid" id="image" style="display: block;">
+        
+        <!-- Radio buttons for Single Coordinate or Multiple Coordinates -->
+        <div class="form-input-wrapper">
+            <label><input type="radio" name="coordinate_type" value="single" id="single_coordinate" onclick="toggleInputFields()"> Single Coordinate</label>
+            <label><input type="radio" name="coordinate_type" value="multiple" id="multiple_coordinates" onclick="toggleInputFields()"> Multiple Coordinates (CSV Format)</label>
+        </div>
+
+        <form method="POST" action="" enctype="multipart/form-data">
+            
+            {% if error %}
+            <div style="color: red;"><b>{{ error }}</b></div>
+            {% endif %}
+            {% csrf_token %}
+            
+            <!-- Single Coordinate Input Fields -->
+            <div id="singleCoordinateFields" style="display: none;">
+                <h4>Single Coordinate</h4>
+                <div class="form-input-wrapper">
+                    <label for="latitude" class="form-label">Latitude</label>
+                    <input type="text" id="latitude" class="form-input" name="lat" placeholder="Enter Latitude in Decimal Degree">
+                </div>
+                <div class="form-input-wrapper mb-3">
+                    <label for="longitude" class="form-label">Longitude</label>
+                    <input type="text" id="longitude" class="form-input mb-4" name="lon" placeholder="Enter Longitude in Decimal Degree">
+                </div>
+            </div>
+
+            <!-- Multiple Coordinates Input Fields -->
+            <div id="multipleCoordinatesFields" style="display: none;">
+                <h4 class="mb-3">Multiple Coordinates (CSV Format)</h4>
+                <div class="form-input-wrapper">
+                    <label for="csv_file" class="form-label">Upload CSV File</label>
+                    <input type="file" id="csv_file" name="csv_file" accept=".csv">
+                </div>
+                <br>
+                <div class="text-container">
+                    <h4><b>Instructions</b></h4>
+                    <p class="line"><i class="fa-solid fa-circle-dot"></i>File should be .csv (comma separated values) format.</p>
+                    <p class="line"><i class="fa-solid fa-circle-dot"></i>Enter Latitude values in 1st column of .csv file</p>
+                    <p class="line"><i class="fa-solid fa-circle-dot"></i>Enter Longitude values in 2nd Column of .csv file</p>
+                    <p class="line"><i class="fa-solid fa-circle-dot"></i>First row of .csv file will be the Header (as shown):<strong class="ml-2"> lat lon </strong></p>
+                    <div class="download-link-container">
+                        <a href="{% static 'sample.csv' %}" download>
+                            <i class="fas fa-download"></i> Download Sample CSV File
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="form-button mt-4 btn btn-primary" style="background-color: #001f3f;">Submit</button>
+        </form>
+
+        {% if show_download_button %}
+        <a href="{% url 'download_points' %}?points_data={{ points_data|urlencode }}" class="btn btn-success mt-4">Download Points Data</a>
+        {% endif %}
+
+        <!-- Table to display results -->
+        {% if exact_point or average_value or points_data %}
+    <div class="table-responsive mt-4" id="resultTable">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">Latitude</th>
+                    <th scope="col">Longitude</th>
+                    <th scope="col">N Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if exact_point %}
+                    <tr>
+                        <td>{{ exact_point.latitude }}</td>
+                        <td>{{ exact_point.longitude }}</td>
+                        <td>{{ exact_point.value }}</td>
+                    </tr>
+                {% endif %}
+
+                {% if average_value %}
+                    <tr>
+                        <td>{{ lat_data }}</td>
+                        <td>{{ lon_data }}</td>
+                        <td>{{ average_value }}</td>
+                    </tr>
+                {% endif %}
+
+                {% for data in points_data %}
+                    <tr>
+                        <td>{{ data.latitude }}</td>
+                        <td>{{ data.longitude }}</td>
+                        <td>
+                            {% if data.exact_point %}
+                                {{ data.exact_point.value }}
+                            {% elif data.average_value %}
+                                {{ data.average_value }}
+                            {% elif data.error_message %}
+                                <div class="alert alert-danger" role="alert">{{ data.error_message }}</div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function toggleInputFields() {
+            var singleCoordinateFields = document.getElementById('singleCoordinateFields');
+            var multipleCoordinatesFields = document.getElementById('multipleCoordinatesFields');
+            var image = document.getElementById('image');
+            var resultTable = document.getElementById('resultTable');
+
+            if (document.getElementById('single_coordinate').checked) {
+                singleCoordinateFields.style.display = 'block';
+                multipleCoordinatesFields.style.display = 'none';
+                image.style.display = 'none';
+            } else if (document.getElementById('multiple_coordinates').checked) {
+                multipleCoordinatesFields.style.display = 'block';
+                singleCoordinateFields.style.display = 'none';
+                image.style.display = 'none';
+            } else {
+                singleCoordinateFields.style.display = 'none';
+                multipleCoordinatesFields.style.display = 'none';
+                image.style.display = 'block';
+            }
+
+            // Check if resultTable has data and hide the image accordingly
+            if (resultTable && resultTable.querySelector('tbody').children.length > 0) {
+                image.style.display = 'none';
+            }
+        }
+
+        // Initial state setup
+        toggleInputFields();
+
+        // Attach the function to the radio buttons
+        document.getElementById('single_coordinate').addEventListener('click', toggleInputFields);
+        document.getElementById('multiple_coordinates').addEventListener('click', toggleInputFields);
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<style>
+    /* Existing styles */
+    
+    .text-container {
+        max-width: 100%;
+        padding: 20px;
+        border-radius: 12px;
+        background-color: #e9f7fe;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        color: #333;
+        text-align: left;
+    }
+    .form-heading {
+        text-align: center;
+        color: #001f3f;
+    }
+    .form-container {
+        padding: 20px;
+        border-radius: 12px;
+        background-color: #f0f8ff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        text-align: center;
+    }
+    /* Styling for radio buttons */
+    .radio-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .radio-option {
+        display: flex;
+        align-items: center;
+        background-color: #007bff;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin: 0 10px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-weight: bold;
+    }
+    .radio-option:hover {
+        background-color: #0056b3;
+    }
+    .radio-option input[type="radio"] {
+        display: none;
+    }
+    .radio-option label {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="form-container">
+        <h2 class="form-heading">InGM: INDIAN GEOID MODEL</h2>
+        <h3 class="form-heading mb-3">Geoid Undulation (N-Value)</h3>
+        <img src="{% static 'img/h.jpeg' %}" alt="Side Image" class="img-fluid">
+        
+        <!-- Radio buttons with onclick navigation -->
+        <div class="radio-container">
+            <div class="radio-option" onclick="window.location.href='{% url 'geoid_valuefind' %}?option=single'">
+                <input type="radio" id="option1" name="pageOption" value="page1">
+                <label for="option1">Single Coordinate</label>
+            </div>
+            <div class="radio-option" onclick="window.location.href='{% url 'geoid_valuefind' %}?option=multiple'">
+                <input type="radio" id="option2" name="pageOption" value="page2">
+                <label for="option2">Multiple Coordinates (CSV Format)</label>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

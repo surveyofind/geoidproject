@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<style>
+    .text-container {
+        max-width: 100%;
+        padding: 20px;
+        border-radius: 12px;
+        background-color: #e9f7fe;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        /* font-family: Arial, sans-serif; */
+        color: #333;
+        /* margin-top: 20px; */
+        text-align: left;
+    }
+    .text-container h4 {
+        font-size: 22px;
+        color: #001f3f;
+        margin-bottom: 15px;
+    }
+    .line {
+        margin: 10px 0;
+        font-size: 14px;
+        color: #555;
+        display: flex;
+        align-items: center;
+    }
+    .line i {
+        color: #001f3f;
+        margin-right: 10px;
+        font-size: 10px;
+    }
+    .download-link-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .download-link-container a {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .download-link-container a:hover {
+        background-color: #050551;
+    }
+   
+    .form-heading {
+        text-align: center;
+        color: #001f3f;
+    }
+    .form-input-wrapper {
+        margin-bottom: 20px;
+    }
+    .form-input-wrapper label {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    .form-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+
+    .form-button:hover {
+        background-color: #003366;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="form-container">
+        <h2 class="form-heading">InGM: INDIAN GEOID MODEL</h2>
+        <h3 class="form-heading mb-3">Geoid Undulation (N-Value)</h3>
+        <form method="POST" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+    
+            {% if option == 'single' %}
+                <!-- Single Coordinate Section -->
+                <h4>Single Coordinate</h4>
+                <div class="form-input-wrapper">
+                    <label for="latitude" class="form-label">Latitude</label>
+                    <input type="text" id="latitude" class="form-input" name="lat" placeholder="Enter Latitude in Decimal Degree" required>
+                </div>
+                <div class="form-input-wrapper mb-3">
+                    <label for="longitude" class="form-label">Longitude</label>
+                    <input type="text" id="longitude" class="form-input mb-4" name="lon" placeholder="Enter Longitude in Decimal Degree" required>
+                </div>
+                <div class="form-input-wrapper mb-3">
+                    <label for="longitude" class="form-label">Ellipsoidal Height (Optional)</label>
+                    <input type="text" id="longitude" class="form-input mb-4" name="Ellipsoidal_Height" placeholder="Enter Ellipsoidal Height in metres">
+                </div>
+            {% endif %}
+    
+            {% if option == 'multiple' %}
+                <!-- Multiple Coordinates (CSV Format) Section -->
+                <h4 class="mb-3">Multiple Coordinates (CSV Format)</h4>
+                <div class="form-input-wrapper">
+                    <label for="csv_file" class="form-label">Upload CSV File</label>
+                    <input type="file" id="csv_file" name="csv_file" accept=".csv">
+                </div>
+                <div class="text-container">
+                    <h4><b>Instructions</b></h4>
+                    <p class="line">File should be .csv (comma separated values) format.</p>
+                    <p class="line">Enter Latitude values (in decimal degrees) in the 1st column of the .csv file.</p>
+                    <p class="line">Enter Longitude values (in decimal degrees) in the 2nd Column of the .csv file.</p>
+                    <p class="line">Enter Ellipsoidal Height values (Optional) in the 3rd Column of the .csv file.</p>
+                    <p class="line">The first row of the .csv file will be the header as shown: <strong>lat lon Ellipsoidal_Height</strong></p>
+                    <div class="download-link-container">
+                        <a href="{% static 'sample.csv' %}" download>
+                            <i class="fas fa-download"></i> Download Sample CSV File
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+        
+            
+            {% if points_data %}
+            <a class="btn btn-primary mt-4" href="{% url 'download_csv' %}">Download Processed Data CSV</a>
+            <h4 class="mt-4">Results</h4>
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                    {% if points_data.0.adjusted_value is not none %}
+                        <th>Ellipsoidal Height</th>
+                        {% endif %}
+                        <th>N-Value</th>
+                        {% if points_data.0.adjusted_value is not none %}
+                        <th>Orthometric Hight</th>
+                        {% endif %}
+                        <th>Error Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for point in points_data %}
+                    <tr>
+                        <td>{{ point.latitude }}</td>
+                        <td>{{ point.longitude }}</td>
+                        {% if point.adjusted_value is not none %}
+                        <td>{{ point.e_hight }}</td>
+                        {% endif %}
+                        <td>{{ point.n_value }}</td>
+                        {% if point.adjusted_value is not none %}
+                        <td>{{ point.adjusted_value }}</td>
+                        {% endif %}
+                        <td>{{ point.error_message }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% elif error_message %}
+            <div class="alert alert-danger mt-4">
+                {{ error_message }}
+            </div>
+        {% endif %}
+            
+            
+            <!-- Instructions Section, common for both options -->
+         
+    
+            <button type="submit" class="form-button mt-4 btn btn-primary" style="background-color: #001f3f;">Submit</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

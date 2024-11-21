@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f6f8;
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+
+    h1 {
+        text-align: center;
+        margin: 40px 0;
+        color: #333;
+        font-size: 2.5em;
+        font-weight: 500;
+    }
+
+    .form-container {
+        width: 80%;
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .form-container:hover {
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+        transition: background-color 0.2s;
+    }
+
+    .form-row:hover {
+        background-color: #f9f9f9;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #4a4a4a;
+        width: 35%;
+        padding-right: 10px;
+        text-align: right;
+    }
+
+    .form-value {
+        width: 60%;
+        padding: 8px 10px;
+        background-color: #f4f6f8;
+        border-radius: 5px;
+        font-size: 0.95em;
+        transition: background-color 0.2s ease;
+    }
+
+    .form-value a {
+        color: #6c63ff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .form-value a:hover {
+        color: #333;
+        text-decoration: underline;
+    }
+
+    hr {
+        border: none;
+        border-top: 1px solid #ddd;
+        margin: 20px 0;
+    }
+</style>
+{% endblock css %}
+
+{% block body %}
+    <h1>User Information</h1>
+    <div class="form-container">
+        <form method="post" action="">
+            {% csrf_token %}
+            {% for user in alldata %}
+            <div class="form-row">
+                <div class="form-label">Username:</div>
+                <div class="form-value">{{ user.username }}</div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">Email:</div>
+                <div class="form-value">{{ user.email }}</div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">Mobile No:</div>
+                <div class="form-value">{{ user.mobile_no }}</div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">Aadhaar No:</div>
+                <div class="form-value">{{ user.aadhar_no }}</div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">Uploaded Aadhaar Card:</div>
+                <div class="form-value">
+                    {% if user.aadharcard_upload %}
+                    <a href="{{ user.aadharcard_upload.url }}" target="_blank">View Document</a>
+                    {% else %}
+                    No File Available
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">User Type:</div>
+                <div class="form-value">{{ user.user_types }}</div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">Uploaded Undertaking Document:</div>
+                <div class="form-value">
+                    {% if user.nda_upload %}
+                    <a href="{{ user.nda_upload.url }}" target="_blank">View Document</a>
+                    {% else %}
+                    No File Available
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user.user_types == "GOVT USER" %}
+                <div class="form-row">
+                    <div class="form-label">Government Id No:</div>
+                    <div class="form-value">{{ user.goverment_idcard_no }}</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Uploaded Government ID Card:</div>
+                    <div class="form-value">
+                        {% if user.govt_idcard %}
+                        <a href="{{ user.govt_idcard.url }}" target="_blank">View Document</a>
+                        {% else %}
+                        No File Available
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if user.user_types == "ACADEMIC USER" %}
+                <div class="form-row">
+                    <div class="form-label">Student Id No:</div>
+                    <div class="form-value">{{ user.student_idcard_no }}</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Uploaded Academic ID Card:</div>
+                    <div class="form-value">
+                        {% if user.institute_idcard %}
+                        <a href="{{ user.institute_idcard.url }}" target="_blank">View Document</a>
+                        {% else %}
+                        No File Available
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="form-row">
+                <div class="form-label">Status:</div>
+                <div class="form-value">{{ user.status }}</div>
+            </div>
+            <div class="form-row">
+                <div class="form-label">Approval Status:</div>
+                <div class="form-value">
+                    <select name="status">
+                        <option value="PENDING" {% if user.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                        <option value="APPROVED" {% if user.status == 'APPROVED' %}selected{% endif %}>Approved</option>
+                        <option value="REJECTED" {% if user.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+            </div>
+            <hr>
+            {% endfor %}
+            <button style="background-color: blue;" type="submit">Update Status</button>
+        </form>
+        
+        <!-- <form method="post" action="{% url 'update_user_status' user.id %}">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-label">Approval Status:</div>
+                <div class="form-value">
+                    <select name="status">
+                        <option value="Panding" {% if user.status == 'PENDING' %}selected{% endif %}>Panding</option>
+                        <option value="Approved" {% if user.status == 'APPROVED' %}selected{% endif %}>Approved</option>
+                        <option value="Rejected" {% if user.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit">Update Status</button>
+        </form> -->
+    </div>
+{% endblock body %}
